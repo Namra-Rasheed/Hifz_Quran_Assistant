@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Table</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f4f6f7; /* Light background color */
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            background-color: #afc69e;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 50px;
+        }
+
+        .table th,
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        
+
+        h1 {
+            color: #244809;
+        }
+
+        .table-container {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Quiz Question Table</h1>
+
+        <!-- Table to show user data -->
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">question_text</th>
+                        <th scope="col">option1</th>
+                        <th scope="col">option2</th>
+                        <th scope="col">option3</th>
+                        <th scope="col">option4</th>
+                        <th scope="col">correct_option</th>
+                        
+                    </tr>
+                </thead>
+                <tbody id="Question">
+                    <!-- Dynamic rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+
+        
+    </div>
+
+    <script>
+        // Fetch user data from the backend
+        fetch('fetch_questions.php')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('Question');
+                let userCount = 0;
+                data.forEach(questions => {
+                    const row = `
+                        <tr>
+                            <th>${questions.question_text}</th>
+                            <td>${questions.option1}</td>
+                            <td>${questions.option2}</td>
+                            <td>${questions.option3}</td>
+                            <td>${questions.option4}</td>
+                            <td>${questions.correct_option}</td>
+                            
+                            
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                    userCount++;
+                });
+                
+              }) 
+            .catch(error => console.error('Error fetching users:', error));
+
+        
+
+        
+
+        
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Table</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f4f6f7; /* Light background color */
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            background-color: #afc69e;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 50px;
+        }
+
+        .table th,
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        
+
+        h1 {
+            color: #244809;
+        }
+
+        .table-container {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Users</h1>
+
+        <!-- Table to show user data -->
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Dynamic rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+
+        
+    </div>
+
+    <script>
+        // Fetch user data from the backend
+        fetch('fetch_user.php')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('userTableBody');
+                let userCount = 0;
+                data.forEach(user => {
+                    const row = `
+                        <tr>
+                            <th scope="row">${user.id}</th>
+                            <td>${user.name}</td>
+                            <td>${user.email}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                    userCount++;
+                });
+
+                // Display pie chart with the number of users
+                const ctx = document.getElementById('usersPieChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Users'],
+                        datasets: [{
+                            label: 'Number of Users',
+                            data: [userCount],
+                            backgroundColor: ['#4f9727', '#ff6384', '#ffcd56'],
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        let percentage = ((tooltipItem.raw / userCount) * 100).toFixed(2);
+                                        return `${tooltipItem.label}: ${tooltipItem.raw} (${percentage}%)`;
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                display: true,
+                                formatter: function(value, context) {
+                                    let percentage = ((value / userCount) * 100).toFixed(2);
+                                    return `${percentage}%`;
+                                },
+                                color: '#fff',
+                                font: {
+                                    weight: 'bold',
+                                    size: 16
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching users:', error));
+
+        // Function to delete a user
+        function deleteUser(userId) {
+            if (confirm("Are you sure you want to delete this user?")) {
+                fetch(`del_user.php?id=${userId}`, {
+                    method: 'GET'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('User deleted successfully.');
+                        location.reload(); // Reload the page to update the table
+                    } else {
+                        alert('Error deleting user.');
+                    }
+                })
+                .catch(error => console.error('Error deleting user:', error));
+            }
+        }
+    </script>
+</body>
+
+</html>

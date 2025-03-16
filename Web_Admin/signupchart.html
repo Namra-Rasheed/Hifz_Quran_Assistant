@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Signup Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+     body {
+            background-color: #afc69e; /* Light background color */
+            font-family: 'Arial', sans-serif;
+        }
+
+    /* Adjust the size of the chart container */
+        #signupChart {
+            max-width: 600px; /* Adjust the width of the chart */
+            max-height: 900px; /* Adjust the height of the chart */
+            margin: auto; /* Center the chart horizontally */
+            display: block;
+        }
+        h2 {
+            color: #244809;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>User Signup Chart</h2>
+    <canvas id="signupChart" ></canvas>
+
+    <script>
+        // Fetch signup data from PHP script
+        fetch('chart.php')
+            .then(response => response.json())
+            .then(data => {
+                // Extract labels and data for the chart
+                const labels = data.map(row => row.signup_date);
+                const counts = data.map(row => row.user_count);
+
+                // Create bar chart using Chart.js
+                const ctx = document.getElementById('signupChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Number of Users',
+                            data: counts,
+                            backgroundColor: 'white',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>
